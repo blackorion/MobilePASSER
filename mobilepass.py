@@ -5,6 +5,7 @@ import base64
 import hashlib
 import hmac
 import sys
+import myconfig
 
 from activationcode import ActivationCode
 
@@ -100,8 +101,24 @@ def generate_mobilepass_token(activation_key, index, policy=''):
         h = h % (10**6)
         return '%0*d' % (6, h)
 
+def next_index():
+	f = open(myconfig.last_index_file_path, 'r+')
+	index = int(f.readline())
+	index += 1
+	val = str(index)
+	f.seek(0)
+	f.write(val)
+	f.close()
+	return index
+
+def get_index():
+	if len(sys.argv) > 1:
+		return int(sys.argv[1])
+	else:
+		return next_index()
+
 if __name__ == '__main__':
-        key = "QVKYC-FM6KO-SY6F7-TR22W"
-        policy = ""
-        index = 0
-        print generate_mobilepass_token(key, index, policy)   # 374844
+	key = myconfig.secret
+	policy = myconfig.policy
+	index = get_index()
+        print generate_mobilepass_token(key, index, policy)
